@@ -1,1 +1,3 @@
-userControllers.test.js has write over here, there is login, signup, logout api call unit test written.
+
+getUserControllers.test.js is written over here,
+getUser and getallInstructors api unit testing made here
