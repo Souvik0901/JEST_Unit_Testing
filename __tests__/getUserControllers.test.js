@@ -9,7 +9,6 @@ jest.mock('../middleware/authenticateUser', () =>({
 }))
 
 
-
 describe('GET, getuserdata', ()=>{
   it('should return user doesnot exist', async () => {
     Users.findOne.mockResolvedValue(null); 
@@ -77,3 +76,70 @@ describe('GET, getuserdata', ()=>{
      expect(response.body).toHaveProperty('message', 'Error during login');
   });
 })
+
+
+
+
+describe('GET, getinstructorsdata', () => {
+  it('should return no instructors found', async() => {
+    Users.find.mockResolvedValue([]); 
+    verifytoken.mockImplementation((req, res, next) => {
+      req.user = { userId: '1739303dhdk922n' };
+      next();
+    });
+
+    const response = await request(app)
+      .get('/node/api/core/getinstructorsdata')
+      .set('Accept', 'application/json')
+      .send({ userId: '1739303dhdk922n', usertype: 'instructor' })
+      .expect('Content-Type', /json/)
+      .expect(200);
+
+
+    expect(response.body).toHaveProperty('success', false);
+    expect(response.body).toHaveProperty('message', 'No Instructors Found');
+  });
+
+
+  it('should return fetching all instructors', async() => {
+    const mockedInstructors = [
+      { name: 'Instructor 1', userId: '1', usertype: 'instructor' },
+      { name: 'Instructor 2', userId: '2', usertype: 'instructor' },
+    ];
+    Users.find.mockResolvedValue(mockedInstructors);
+    verifytoken.mockImplementation((req, res, next) => {
+      req.user = { userId: '1739303dhdk922n' };
+      next();
+    });
+
+    const response = await request(app)
+      .get('/node/api/core/getinstructorsdata')
+      .set('Accept', 'application/json')
+      .send({ userId: '1739303dhdk922n', usertype: 'instructor' })
+      .expect('Content-Type', /json/)
+      .expect(200);
+
+    expect(response.body).toHaveProperty('success', true);
+    expect(response.body).toHaveProperty('message', 'Fetching all instructors');
+  });
+
+  
+  it('should return error retrieving instructors', async() => {
+    Users.find.mockRejectedValue(new Error('Mocked error retrieving instructors'));
+    verifytoken.mockImplementation((req, res, next) => {
+      req.user = { userId: '1739303dhdk922n' };
+      next();
+    });
+
+    const response = await request(app)
+      .get('/node/api/core/getinstructorsdata')
+      .set('Accept', 'application/json')
+      .send({ userId: '1739303dhdk922n', usertype: 'instructor' })
+      .expect('Content-Type', /json/)
+      .expect(200);
+
+    expect(response.body).toHaveProperty('success', false);
+    expect(response.body).toHaveProperty('message', 'Error retrieving instructors');
+    expect(response.body).toHaveProperty('error', 'Mocked error retrieving instructors');
+  });
+});
