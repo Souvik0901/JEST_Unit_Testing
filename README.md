@@ -1,2 +1,2 @@
-deleteAccount.test.js is written over here,
-removeUser api unit testing made here
+editProfile.test.js is written over here,
+undateProfileinfo api unit testing made here
